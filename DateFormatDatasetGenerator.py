@@ -65,6 +65,7 @@
 
 import xlsxwriter
 import csv
+import random
 from datetime import date
 
 class DateFormatDatasetGenerator:
@@ -95,7 +96,7 @@ class DateFormatDatasetGenerator:
 
 	#constant parameters
 	NUMBER_OF_ROWS = 10
-	MAX_DATE_RANGE_IN_YEARS = 0
+	MAX_DATE_RANGE_IN_YEARS = 100
 
 	workbook = xlsxwriter.Workbook("DateFormat.xlsx");
 	worksheet = workbook.add_worksheet();
@@ -103,6 +104,7 @@ class DateFormatDatasetGenerator:
 	def __init__(self):
 		self.create();
 		self.workbook.close();
+		self.createHugeDateRange();
 
 	def create(self):
 		specialDates = self.createSpecialCasesDates();
@@ -199,10 +201,64 @@ class DateFormatDatasetGenerator:
 		self.worksheet.write(self.HEADER_ROW, self.col, "PLAYER_ID");
 		self.worksheet.write(self.VALUE_ROW_START, self.col, 0);
 
+		self.worksheet.write(self.HEADER_ROW, self.col, "SALES");
+		self.worksheet.write(self.VALUE_ROW_START, self.col, 5);
+
 		for date in dateList:
 			self.worksheet.write(self.HEADER_ROW, self.col, "date{0}".format(self.col));
 			self.worksheet.write(self.VALUE_ROW_START, self.col, date);
 			self.col += 1;
+
+	def createHugeDateRange(self):
+		workbook = xlsxwriter.Workbook("DateBigRange.xlsx");
+		worksheet = workbook.add_worksheet();
+
+		row = 0;
+		col = 0;
+		playerId = 0;
+		worksheet.write(row, col, "PLAYER_ID");
+		worksheet.write(row, col+1, "SALES");
+		worksheet.write(row, col+2, "DATE_100");
+		worksheet.write(row, col+3, "DATE_50");
+		worksheet.write(row, col+4, "DATE_25");
+		worksheet.write(row, col+5, "DATE_10");
+		worksheet.write(row, col+6, "DATE_5");
+		row += 1;
+
+		maxDateRange = self.MAX_DATE_RANGE_IN_YEARS;
+
+		today = date.today();
+		minYear = today.year-maxDateRange;
+		maxYear = today.year;
+
+		print("min:{0}, max:{1}".format(minYear,maxYear));
+
+		#insert the min and max year first to get it over with
+		worksheet.write(row, col, playerId);
+		worksheet.write(row, col+1, random.randrange(0,50));
+		worksheet.write(row, col+2, date(minYear, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+3, date(today.year-50, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+4, date(today.year-25, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+5, date(today.year-10, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+6, date(today.year-5, random.randrange(1,13), random.randrange(1,29)).isoformat());
+
+
+
+		playerId += 1;
+		row += 1;
+
+		worksheet.write(row, col, playerId);
+		worksheet.write(row, col+1, random.randrange(0,50));
+		worksheet.write(row, col+2, date(maxYear, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+3, date(maxYear, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+4, date(maxYear, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+5, date(maxYear, random.randrange(1,13), random.randrange(1,29)).isoformat());
+		worksheet.write(row, col+6, date(maxYear, random.randrange(1,13), random.randrange(1,29)).isoformat());
+
+		playerId +=1;
+		row+=1;
+
+		workbook.close();
 
 generator = DateFormatDatasetGenerator();
 
